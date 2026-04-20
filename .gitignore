@@ -67,3 +67,5 @@ logs/
 *.old
 *.orig
 *.tmp
+# Notepad artifacts
+*.txt
