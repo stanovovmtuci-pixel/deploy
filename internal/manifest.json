@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "generated_from_snapshot": "ru-snapshot-20260420-110722",
+  "placeholders": {
+    "NODE_ID":                    {"asked": true,  "example": "1"},
+    "BASE_DOMAIN":                {"asked": true,  "example": "example.com"},
+    "NODE_FQDN":                  {"derived": "node{{NODE_ID}}.{{BASE_DOMAIN}}"},
+    "ADMIN_USER":                 {"asked": true,  "default": "admin"},
+    "INTERNAL_IPV4":              {"auto": "ip -4 addr"},
+    "INTERNAL_IPV6":              {"auto": "ip -6 addr"},
+    "WAN_IFACE":                  {"auto": "ip route default"},
+    "EXTERNAL_IPV6_EP":           {"asked": true,  "phase": "awg"},
+    "EXTERNAL_AWG_PORT":          {"default": "51821"},
+    "INTERNAL_AWG_LISTEN_PORT":   {"random_range": "30000-60000"},
+    "AWG_PRIV_INTERNAL":          {"generated": "awg genkey"},
+    "AWG_PUB_EXTERNAL":           {"fetched": "ssh from external server"},
+    "AWG_TUN_IPV6_INTERNAL":      {"default": "fd10::2"},
+    "AWG_TUN_IPV6_EXTERNAL":      {"default": "fd10::1"},
+    "AWG_TUN_IPV4_INTERNAL":      {"default": "10.10.0.2"},
+    "AWG_TUN_IPV4_EXTERNAL":      {"default": "10.10.0.1"},
+    "AWG_MTU":                    {"default": "1280"},
+    "EXTERNAL_PROXY_UUID":        {"generated": "uuidgen"},
+    "EXTERNAL_PROXY_PORT":        {"random_range": "10000-20000"},
+    "SSLH_CAMO_SNI":              {"default": "yandex.ru"},
+    "X_UI_WEB_BASE":              {"default": "/p4n3l"},
+    "X_UI_PANEL_PORT":            {"default": "2053"},
+    "X_UI_ADMIN_USER":            {"generated": "random"},
+    "X_UI_ADMIN_PASS":            {"generated": "openssl rand"},
+    "FILTERED_KEYWORD":           {"asked": true,  "default": "filtered"},
+    "PRXY_PANEL_INIT_PASSWORD":   {"generated": "openssl rand"},
+    "F2B_IGNORE_IPS":             {"asked": true,  "wizard": true},
+    "REALITY_DEST":               {"default": "yandex.ru:443"},
+    "CURRENT_YEAR":               {"auto": "date +%Y"}
+  },
+  "removed_components": [
+    "OpenVPN server",
+    "easy-rsa PKI",
+    "tproxy-ovpn xray inbound",
+    "openvpn protocol in sslh",
+    "geodat-update.{service,timer}",
+    "awg0-ipv4.service (Telegram routes)",
+    "static IPv4 routes for 91.108/16, 149.154/16, 91.105.192/24",
+    "ss.conf separate vhost (merged into main)",
+    "rc-local.service",
+    "3proxy traces"
+  ],
+  "renamed": {
+    "fin-proxy outbound": "external-proxy"
+  }
+}

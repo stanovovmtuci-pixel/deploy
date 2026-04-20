@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTP Time Server — Moscow (MSK)</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0a0e17;color:#c8d6e5;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+        .header{background:linear-gradient(135deg,#1a1f36 0%,#0d1225 100%);width:100%;padding:24px 0;text-align:center;border-bottom:1px solid #1e2a45}
+        .header h1{font-size:1.6em;color:#5dade2;font-weight:600}
+        .header p{color:#7f8fa6;font-size:.9em;margin-top:6px}
+        .clock-container{margin-top:60px;text-align:center}
+        .clock{font-size:5em;font-weight:700;color:#fff;font-family:'Courier New',monospace;letter-spacing:4px;text-shadow:0 0 20px rgba(93,173,226,.3)}
+        .date{font-size:1.3em;color:#7f8fa6;margin-top:10px}
+        .timezone-badge{display:inline-block;background:#1a2742;border:1px solid #2e4a6e;border-radius:6px;padding:8px 20px;margin-top:20px;font-size:.95em;color:#5dade2}
+        .info-section{margin-top:60px;width:90%;max-width:800px}
+        .info-section h2{font-size:1.2em;color:#5dade2;margin-bottom:16px;border-bottom:1px solid #1e2a45;padding-bottom:8px}
+        table{width:100%;border-collapse:collapse;margin-bottom:40px}
+        th,td{padding:12px 16px;text-align:left;border-bottom:1px solid #151d30}
+        th{background:#111827;color:#5dade2;font-weight:600;font-size:.85em;text-transform:uppercase}
+        td{font-family:'Courier New',monospace;font-size:.9em}
+        .status-ok{color:#2ecc71}
+        .footer{margin-top:auto;padding:20px;text-align:center;color:#3d4f6f;font-size:.8em;border-top:1px solid #151d30;width:100%}
+        .footer a{color:#5dade2;text-decoration:none}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>&#128337; NTP Time Service</h1>
+        <p>Network Time Protocol — Moscow Reference</p>
+    </div>
+    <div class="clock-container">
+        <div class="clock" id="clock">--:--:--</div>
+        <div class="date" id="date">Loading...</div>
+        <div class="timezone-badge">UTC+3 / Europe/Moscow (MSK)</div>
+    </div>
+    <div class="info-section">
+        <h2>NTP Server Addresses</h2>
+        <p style="color:#7f8fa6;margin-bottom:16px;font-size:.9em">Select one or more addresses from the list below and configure your system for time synchronization.</p>
+        <h2 style="margin-top:30px">&#127479;&#127482; Russian Zone</h2>
+        <table>
+            <thead><tr><th>Zone</th><th>Server Address (Pool)</th><th>IPv6</th><th>Status</th></tr></thead>
+            <tbody>
+                <tr><td>Russia</td><td>0.ru.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Russia</td><td>1.ru.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Russia</td><td>2.ru.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Russia</td><td>3.ru.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+            </tbody>
+        </table>
+        <h2>&#127466;&#127482; European Zone</h2>
+        <table>
+            <thead><tr><th>Zone</th><th>Server Address (Pool)</th><th>IPv6</th><th>Status</th></tr></thead>
+            <tbody>
+                <tr><td>Europe</td><td>0.europe.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Europe</td><td>1.europe.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Europe</td><td>2.europe.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+                <tr><td>Europe</td><td>3.europe.pool.ntp.org</td><td>Yes</td><td class="status-ok">&#9679; Dynamic</td></tr>
+            </tbody>
+        </table>
+        <h2>Configuration Examples</h2>
+        <table>
+            <thead><tr><th>OS / Software</th><th>Command / Config</th></tr></thead>
+            <tbody>
+                <tr><td>Linux (systemd)</td><td>timedatectl set-ntp true</td></tr>
+                <tr><td>Linux (ntpd)</td><td>server 0.ru.pool.ntp.org iburst</td></tr>
+                <tr><td>Windows</td><td>w32tm /config /manualpeerlist:"0.ru.pool.ntp.org"</td></tr>
+                <tr><td>macOS</td><td>sudo sntp -sS 0.ru.pool.ntp.org</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="footer">&copy; {{CURRENT_YEAR}} NTP Time Service &mdash; Data sourced from <a href="https://www.ntppool.org/zone/ru">pool.ntp.org</a></div>
+    <script>
+        function updateClock(){
+            var now=new Date();
+            var msk=new Date(now.toLocaleString("en-US",{timeZone:"Europe/Moscow"}));
+            var h=String(msk.getHours()).padStart(2,'0');
+            var m=String(msk.getMinutes()).padStart(2,'0');
+            var s=String(msk.getSeconds()).padStart(2,'0');
+            document.getElementById('clock').textContent=h+':'+m+':'+s;
+            var options={weekday:'long',year:'numeric',month:'long',day:'numeric',timeZone:'Europe/Moscow'};
+            document.getElementById('date').textContent=msk.toLocaleDateString('ru-RU',options);
+        }
+        updateClock();setInterval(updateClock,1000);
+    </script>
+</body>
+</html>

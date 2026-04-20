@@ -1,0 +1,9 @@
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/local/bin/smart-proxy-ctl
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/journalctl
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart x-ui, /usr/bin/systemctl stop x-ui, /usr/bin/systemctl start x-ui
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart smart-proxy, /usr/bin/systemctl stop smart-proxy, /usr/bin/systemctl start smart-proxy
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart nginx, /usr/bin/systemctl stop nginx, /usr/bin/systemctl start nginx
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart sslh, /usr/bin/systemctl stop sslh, /usr/bin/systemctl start sslh
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart awg-quick@awg0, /usr/bin/systemctl stop awg-quick@awg0, /usr/bin/systemctl start awg-quick@awg0
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/tail -f /var/log/smart-proxy-access.log
+{{ADMIN_USER}} ALL=(ALL) NOPASSWD: /usr/bin/tail -f /var/log/smart-proxy.log

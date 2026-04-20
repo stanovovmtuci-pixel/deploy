@@ -1,0 +1,21 @@
+[Interface]
+MTU = {{AWG_MTU}}
+PrivateKey = {{AWG_PRIV_INTERNAL}}
+Address = {{AWG_TUN_IPV6_INTERNAL}}/64, {{AWG_TUN_IPV4_INTERNAL}}/30
+ListenPort = {{INTERNAL_AWG_LISTEN_PORT}}
+Jc = 6
+Jmin = 10
+Jmax = 50
+S1 = 17
+S2 = 122
+H1 = 1264594632
+H2 = 2000220747
+H3 = 2034288160
+H4 = 2091671248
+
+[Peer]
+# External server
+PublicKey = {{AWG_PUB_EXTERNAL}}
+Endpoint = [{{EXTERNAL_IPV6_EP}}]:{{EXTERNAL_AWG_PORT}}
+AllowedIPs = {{AWG_TUN_IPV6_EXTERNAL}}/128, {{AWG_TUN_IPV4_EXTERNAL}}/32
+PersistentKeepalive = 25
