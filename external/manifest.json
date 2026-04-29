@@ -1,0 +1,122 @@
+{
+  "version": "1.0",
+  "generated_from_snapshot": "external-snapshot-20260421-050707",
+  "description": "External (FI) node — AWG endpoint + xray VLESS bridge + Cloudflare WARP egress",
+
+  "placeholders": {
+    "NODE_ID":                    {"asked": true,  "example": "1", "validator": "is_valid_node_id"},
+    "NODE_HOSTNAME":              {"derived": "ext-fi-{{NODE_ID}}"},
+    "ADMIN_USER":                 {"asked": true,  "default": "admin", "validator": "is_valid_username"},
+    "ADMIN_PUBKEY":               {"asked": true,  "default": "", "optional": true, "comment": "leave empty to skip key auth setup"},
+
+    "PUBLIC_IPV4":                {"auto": "ip -4 addr of WAN_IFACE"},
+    "PUBLIC_IPV6":                {"auto": "ip -6 addr global of WAN_IFACE", "optional": true},
+    "WAN_IFACE":                  {"auto": "ip route default"},
+
+    "AWG_IFACE":                  {"default": "awg0"},
+    "AWG_LISTEN_PORT":            {"default": "51821",     "validator": "is_valid_port"},
+    "AWG_MTU":                    {"default": "1280"},
+    "AWG_TUN_IPV6":               {"default": "fd10::1"},
+    "AWG_TUN_IPV6_PREFIX":        {"default": "64"},
+    "AWG_PRIV_EXTERNAL":          {"generated": "awg genkey",        "secret": true},
+    "AWG_PUB_EXTERNAL":           {"derived":   "awg pubkey < priv", "expose_to_peer": true},
+
+    "AWG_OBFUSC_JC":              {"default": "6"},
+    "AWG_OBFUSC_JMIN":            {"default": "10"},
+    "AWG_OBFUSC_JMAX":            {"default": "50"},
+    "AWG_OBFUSC_S1":              {"default": "17"},
+    "AWG_OBFUSC_S2":              {"default": "122"},
+    "AWG_OBFUSC_H1":              {"default": "1264594632"},
+    "AWG_OBFUSC_H2":              {"default": "2000220747"},
+    "AWG_OBFUSC_H3":              {"default": "2034288160"},
+    "AWG_OBFUSC_H4":              {"default": "2091671248"},
+
+    "AMNEZIAWG_DKMS_VERSION":     {"default": "1.0.0"},
+    "AMNEZIAWG_GIT_URL":          {"default": "https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git"},
+    "AMNEZIAWG_GIT_REF":          {"default": "master"},
+
+    "WARP_SOCKS5_PORT":           {"default": "40000",     "validator": "is_valid_port"},
+    "WARP_REGISTRATION_MODE":     {"default": "anonymous"},
+
+    "XRAY_VERSION":               {"default": "latest"},
+    "XRAY_INSTALL_DIR":           {"default": "/usr/local/bin"},
+    "XRAY_CONFIG_DIR":            {"default": "/usr/local/etc/xray"},
+    "XRAY_LOG_DIR":               {"default": "/var/log/xray"},
+    "XRAY_SERVICE_USER":          {"default": "nobody"},
+    "XRAY_SERVICE_GROUP":         {"default": "nogroup"},
+
+    "XRAY_INBOUND_TAG":           {"default": "from-ru"},
+    "XRAY_INBOUND_LISTEN":        {"derived": "{{AWG_TUN_IPV6}}"},
+    "XRAY_INBOUND_PORT":          {"random_range": "10000-60000", "validator": "is_valid_port"},
+    "XRAY_INBOUND_TRANSPORT":     {"default": "tcp"},
+
+    "XRAY_CLIENT_UUID":           {"generated": "uuidgen", "secret": true, "expose_to_peer": true},
+    "XRAY_CLIENT_LEVEL":          {"default": "0"},
+
+    "XRAY_OUTBOUND_TAG":          {"default": "warp-out"},
+    "XRAY_OUTBOUND_ADDRESS":      {"default": "127.0.0.1"},
+    "XRAY_OUTBOUND_PORT":         {"derived": "{{WARP_SOCKS5_PORT}}"},
+
+    "F2B_IGNORE_IPS":             {"asked": true,  "wizard": true, "default": "127.0.0.1/8 ::1", "comment": "space-separated; safe to keep default"},
+    "F2B_SSHD_MAXRETRY":          {"default": "5"},
+    "F2B_SSHD_BANTIME":            {"default": "86400"},
+    "F2B_SSHD_FINDTIME":           {"default": "600"},
+    "F2B_RECIDIVE_BANTIME":        {"default": "604800"},
+    "F2B_RECIDIVE_FINDTIME":       {"default": "86400"},
+    "F2B_RECIDIVE_MAXRETRY":       {"default": "5"},
+
+    "UFW_ENABLED":                {"default": "true"},
+    "UFW_DEFAULT_INCOMING":       {"default": "deny"},
+    "UFW_DEFAULT_OUTGOING":       {"default": "allow"},
+    "UFW_DEFAULT_ROUTED":         {"default": "allow"},
+
+    "SSHD_PORT":                  {"default": "22",     "validator": "is_valid_port"},
+    "SSHD_PERMIT_ROOT_LOGIN":     {"default": "no"},
+    "SSHD_PERMIT_PASSWORD_AUTH":  {"asked": true,  "default": "yes", "comment": "Romario uses different devices, password auth needed"},
+    "SSHD_MAX_AUTH_TRIES":        {"default": "3"},
+
+    "SYSCTL_IPV4_FORWARDING":     {"default": "1"},
+    "SYSCTL_IPV6_FORWARDING":     {"default": "1"},
+    "SYSCTL_TCP_BBR":             {"default": "1"},
+    "SYSCTL_TCP_FASTOPEN":        {"default": "3"},
+
+    "DEPLOY_SECRETS_DIR":         {"default": "/root/external-deploy-secrets"},
+    "CURRENT_YEAR":               {"auto": "date +%Y"}
+  },
+
+  "components_installed": [
+    "amneziawg (kernel module via DKMS from git)",
+    "amneziawg-tools (apt)",
+    "cloudflare-warp (apt, anonymous registration)",
+    "xray (binary from XTLS/Xray-core github releases)",
+    "fail2ban (apt, sshd + recidive jails)",
+    "ufw (apt, deny incoming + allow ssh + 51821/udp)",
+    "iptables-persistent / netfilter-persistent (apt)"
+  ],
+
+  "components_NOT_installed": [
+    "Docker (intentionally — external/deploy is for client-serving infra only)",
+    "AmneziaVPN containers (these are personal use, separate)",
+    "GRE tunnel for legacy router (separate, not in deploy-kit)",
+    "3proxy (was a security hole, never reinstalled)"
+  ],
+
+  "post_deploy_actions": [
+    "Run scripts/add-peer.sh on this external to register an internal node as AWG peer",
+    "On internal node, configure xray outbound to point to fd10::1:{{XRAY_INBOUND_PORT}} with UUID {{XRAY_CLIENT_UUID}}",
+    "Verify end-to-end: internal client -> internal xray -> AWG -> external xray -> WARP -> internet",
+    "Download /root/external-deploy-secrets/ via scp and remove from server"
+  ],
+
+  "snapshot_source": {
+    "path": "/c/snap/external/external-snapshot-20260421-050707/",
+    "key_files": [
+      "configs/sshd_config",
+      "configs/fail2ban-jail.local",
+      "xray/config.json",
+      "awg/awg0.conf (privkey masked)",
+      "systemd/xray.service",
+      "systemd/xray.service.d/10-donot_touch_single_conf.conf"
+    ]
+  }
+}
